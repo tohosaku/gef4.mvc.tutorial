@@ -11,10 +11,9 @@ import javax.xml.bind.Marshaller;
 import org.eclipse.core.commands.operations.IOperationHistory;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.commands.operations.IUndoableOperation;
-import org.eclipse.gef4.fx.nodes.InfiniteCanvas;
-import org.eclipse.gef4.mvc.fx.domain.FXDomain;
-import org.eclipse.gef4.mvc.fx.viewer.FXViewer;
-import org.eclipse.gef4.mvc.models.ContentModel;
+import org.eclipse.gef.fx.nodes.InfiniteCanvas;
+import org.eclipse.gef.mvc.fx.domain.HistoricizingDomain;
+import org.eclipse.gef.mvc.fx.viewer.IViewer;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -35,7 +34,7 @@ public class Gef4MvcTutorial extends Application {
 
 	private Model model;
 	private JAXBContext jaxbContext;
-	private FXDomain domain;
+	private HistoricizingDomain domain;
 
 	public static void main(String[] args) {
 		Application.launch(args);
@@ -48,9 +47,9 @@ public class Gef4MvcTutorial extends Application {
 		
 		Injector injector = Guice.createInjector(createGuiceModule());
 		
-		domain = injector.getInstance(FXDomain.class);
+		domain = injector.getInstance(HistoricizingDomain.class);
 		
-		FXViewer viewer = domain.getAdapter(FXViewer.class);
+		IViewer viewer = domain.getAdapter(IViewer.class);
 		
 		HBox paneCtrl = new HBox();
 
@@ -90,7 +89,7 @@ public class Gef4MvcTutorial extends Application {
 		
 		paneCtrl.getChildren().addAll(btnUndo, btnRedo);
 
-		InfiniteCanvas drawingPane = viewer.getCanvas();
+		InfiniteCanvas drawingPane = (InfiniteCanvas)viewer.getCanvas();
 		drawingPane.clipContentProperty().set(true);
 		paneDraw.getChildren().add(drawingPane);
 		paneDraw.setPrefHeight(2000);
@@ -110,8 +109,7 @@ public class Gef4MvcTutorial extends Application {
 
 		domain.activate();
 
-		List<Object> contents = createContents();
-		viewer.getAdapter(ContentModel.class).setContents(contents);
+		viewer.getContents().setAll(createContents());
 		
 		TextNodePart p = (TextNodePart) viewer.getContentPartMap().get(model.getRootNode());
 		p.layout();

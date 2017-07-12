@@ -5,14 +5,14 @@ import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.gef4.fx.nodes.GeometryNode;
-import org.eclipse.gef4.geometry.planar.Dimension;
-import org.eclipse.gef4.geometry.planar.Point;
-import org.eclipse.gef4.geometry.planar.Rectangle;
-import org.eclipse.gef4.geometry.planar.RoundedRectangle;
-import org.eclipse.gef4.mvc.fx.parts.AbstractFXContentPart;
-import org.eclipse.gef4.mvc.fx.policies.FXTransformPolicy;
-import org.eclipse.gef4.mvc.parts.IVisualPart;
+import org.eclipse.gef.fx.nodes.GeometryNode;
+import org.eclipse.gef.geometry.planar.Dimension;
+import org.eclipse.gef.geometry.planar.Point;
+import org.eclipse.gef.geometry.planar.Rectangle;
+import org.eclipse.gef.geometry.planar.RoundedRectangle;
+import org.eclipse.gef.mvc.fx.parts.AbstractContentPart;
+import org.eclipse.gef.mvc.fx.parts.ITransformableContentPart;
+import org.eclipse.gef.mvc.fx.parts.IVisualPart;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
@@ -30,7 +30,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Affine;
 
-public class TextNodePart extends AbstractFXContentPart<StackPane> implements PropertyChangeListener {
+public class TextNodePart extends AbstractContentPart<StackPane> /*implements PropertyChangeListener*/ {
 
 	private Point     layoutVisualPosition = new Point();
 	private Rectangle layoutBounds = new Rectangle();
@@ -43,7 +43,7 @@ public class TextNodePart extends AbstractFXContentPart<StackPane> implements Pr
 	private static final double LAYOUT_VSPACE = 10;
 	private static final double LAYOUT_HSPACE = 25;
 	private Font font = Font.font("Monospace", FontWeight.BOLD, 25 );
-	
+/*	
 	@Override
 	protected void doActivate() {
 		super.doActivate();
@@ -55,7 +55,7 @@ public class TextNodePart extends AbstractFXContentPart<StackPane> implements Pr
 		getContent().removePropertyChangeListener(this);
 		super.doDeactivate();
 	}
-
+*/
 	
 	@Override
 	public TextNode getContent() {
@@ -63,7 +63,7 @@ public class TextNodePart extends AbstractFXContentPart<StackPane> implements Pr
 	}
 
 	@Override
-	protected StackPane createVisual() {
+	protected StackPane doCreateVisual() {
 		
 		StackPane stack = new StackPane();
 		text = new Text();
@@ -114,7 +114,7 @@ public class TextNodePart extends AbstractFXContentPart<StackPane> implements Pr
 				
 		{
 //			Point position = model.getPosition();
-			Affine affine = getAdapter(FXTransformPolicy.TRANSFORM_PROVIDER_KEY).get();
+			Affine affine = getAdapter(ITransformableContentPart.TRANSFORM_PROVIDER_KEY).get();
 			affine.setTx(layoutVisualPosition.x);
 			affine.setTy(layoutVisualPosition.y);
 		}
@@ -137,16 +137,16 @@ public class TextNodePart extends AbstractFXContentPart<StackPane> implements Pr
 		Bounds textBounds = msrText.getLayoutBounds();
 		return textBounds;
 	}
-
+/*
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		if( evt.getSource() == getContent() ){
 			refreshVisual();
 		}
 	}
-	
+*/
 	@Override
-	public SetMultimap<TextNode, String> getContentAnchorages() {
+	public SetMultimap<TextNode, String> doGetContentAnchorages() {
 		HashMultimap<TextNode, String> res = HashMultimap.create();
 		res.put(getContent(), "START");
 		res.put(getContent(), "END");
@@ -154,7 +154,7 @@ public class TextNodePart extends AbstractFXContentPart<StackPane> implements Pr
 	}
 
 	@Override
-	public List<? extends Object> getContentChildren() {
+	public List<? extends Object> doGetContentChildren() {
 		return Collections.emptyList();
 	}
 
@@ -217,7 +217,7 @@ public class TextNodePart extends AbstractFXContentPart<StackPane> implements Pr
 	}
 
 	@Override
-	protected void attachToAnchorageVisual(IVisualPart<Node, ? extends Node> anchorage, String role) {
+	protected void doAttachToAnchorageVisual(IVisualPart<? extends Node> anchorage, String role) {
 	}
 
 }

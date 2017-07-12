@@ -3,12 +3,12 @@ package gef4.mvc.tutorial;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.gef4.fx.nodes.InfiniteCanvas;
-import org.eclipse.gef4.mvc.fx.MvcFxModule;
-import org.eclipse.gef4.mvc.fx.domain.FXDomain;
-import org.eclipse.gef4.mvc.fx.viewer.FXViewer;
-import org.eclipse.gef4.mvc.models.ContentModel;
-import org.eclipse.gef4.mvc.parts.IContentPartFactory;
+import org.eclipse.gef.fx.nodes.InfiniteCanvas;
+import org.eclipse.gef.mvc.fx.MvcFxModule;
+import org.eclipse.gef.mvc.fx.domain.IDomain;
+import org.eclipse.gef.mvc.fx.viewer.IViewer;
+import org.eclipse.gef.mvc.fx.parts.IContentPartFactory;
+import org.eclipse.gef.common.adapt.AdapterKey;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -37,9 +37,9 @@ public class Gef4MvcTutorial extends Application {
 
 		Injector injector = Guice.createInjector(createGuiceModule());
 
-		FXDomain domain = injector.getInstance(FXDomain.class);
+		IDomain domain = injector.getInstance(IDomain.class);
 
-		FXViewer viewer = domain.getAdapter(FXViewer.class);
+		IViewer viewer = domain.getAdapter(AdapterKey.get(IViewer.class,IDomain.CONTENT_VIEWER_ROLE));
 
 		AnchorPane paneCtrl = new AnchorPane();
 		AnchorPane paneDraw = new AnchorPane();
@@ -54,7 +54,7 @@ public class Gef4MvcTutorial extends Application {
 		AnchorPane.setLeftAnchor(btnUpdateModel, 10d);
 		AnchorPane.setRightAnchor(btnUpdateModel, 10d);
 
-		InfiniteCanvas drawingPane = viewer.getCanvas();
+		InfiniteCanvas drawingPane = (InfiniteCanvas) viewer.getCanvas();
 		paneDraw.getChildren().add(drawingPane);
 		paneDraw.setPrefHeight(2000);
 		AnchorPane.setTopAnchor(drawingPane, 10d);
@@ -72,7 +72,7 @@ public class Gef4MvcTutorial extends Application {
 
 		domain.activate();
 
-		viewer.getAdapter(ContentModel.class).getContents().setAll(createContents());
+		viewer.getContents().setAll(createContents());
 	}
 
 	protected List<? extends Object> createContents() {
@@ -86,7 +86,7 @@ public class Gef4MvcTutorial extends Application {
 			protected void configure() {
 				super.configure();
 
-				binder().bind(new TypeLiteral<IContentPartFactory<Node>>() {
+				binder().bind(new TypeLiteral<IContentPartFactory>() {
 				}).toInstance(new ModelPartFactory());
 
 			}

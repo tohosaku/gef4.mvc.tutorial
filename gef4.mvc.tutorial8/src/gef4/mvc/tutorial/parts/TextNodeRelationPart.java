@@ -3,19 +3,20 @@ package gef4.mvc.tutorial.parts;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.gef4.fx.anchors.IAnchor;
-import org.eclipse.gef4.fx.nodes.Connection;
-import org.eclipse.gef4.fx.nodes.IConnectionRouter;
-import org.eclipse.gef4.fx.nodes.PolyBezierConnectionRouter;
-import org.eclipse.gef4.geometry.planar.ICurve;
-import org.eclipse.gef4.geometry.planar.IMultiShape;
-import org.eclipse.gef4.geometry.planar.Line;
-import org.eclipse.gef4.geometry.planar.Path;
-import org.eclipse.gef4.geometry.planar.Point;
-import org.eclipse.gef4.geometry.planar.Polygon;
-import org.eclipse.gef4.geometry.planar.Polyline;
-import org.eclipse.gef4.mvc.fx.parts.AbstractFXContentPart;
-import org.eclipse.gef4.mvc.parts.IVisualPart;
+import org.eclipse.gef.fx.anchors.IAnchor;
+import org.eclipse.gef.fx.nodes.Connection;
+import org.eclipse.gef.fx.nodes.OrthogonalRouter;
+import org.eclipse.gef.fx.nodes.IConnectionRouter;
+import org.eclipse.gef.fx.nodes.PolyBezierInterpolator;
+import org.eclipse.gef.geometry.planar.ICurve;
+import org.eclipse.gef.geometry.planar.IMultiShape;
+import org.eclipse.gef.geometry.planar.Line;
+import org.eclipse.gef.geometry.planar.Path;
+import org.eclipse.gef.geometry.planar.Point;
+import org.eclipse.gef.geometry.planar.Polygon;
+import org.eclipse.gef.geometry.planar.Polyline;
+import org.eclipse.gef.mvc.fx.parts.AbstractContentPart;
+import org.eclipse.gef.mvc.fx.parts.IVisualPart;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
@@ -26,7 +27,7 @@ import gef4.mvc.tutorial.model.TextNodeRelation;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 
-public class TextNodeRelationPart extends AbstractFXContentPart<Connection> {
+public class TextNodeRelationPart extends AbstractContentPart<Connection> {
 
 	private static final String ROLE_START = "START";
 	private static final String ROLE_END   = "END";
@@ -40,10 +41,13 @@ public class TextNodeRelationPart extends AbstractFXContentPart<Connection> {
 	}
 
 	@Override
-	protected Connection createVisual() {
+	protected Connection doCreateVisual() {
 		
 		Connection visual = new Connection();
-		visual.setRouter(new IConnectionRouter(){
+		visual.setRouter(new OrthogonalRouter());
+		/*
+		visual.setRouter(new IConnectionRouter();
+		{
 			@Override
 			public ICurve routeConnection(Point[] points) {
 				if (points == null || points.length < 2) {
@@ -57,9 +61,20 @@ public class TextNodeRelationPart extends AbstractFXContentPart<Connection> {
 				Polyline poly = new Polyline(start, p1, p2, end );
 				return poly;
 			}
+
+			@Override
+			public void route(Connection connection) {
+			}
+
+			@Override
+			public boolean wasInserted(IAnchor anchor) {
+				return false;
+			}
 		});
-		visual.getCurveNode().setStroke(Color.BLACK);
-		visual.getCurveNode().setStrokeWidth(1.5);
+			*/
+		visual.getCurve().setStyle("-fx-stroke: black;-fx-stroke-width:1.5");
+		//setStroke(Color.BLACK);
+		//visual.getCurve()curve().setStrokeWidth(1.5);
 		return visual;
 	}
 
@@ -68,7 +83,7 @@ public class TextNodeRelationPart extends AbstractFXContentPart<Connection> {
 	}
 	
 	@Override
-	public SetMultimap<? extends Object, String> getContentAnchorages() {
+	public SetMultimap<? extends Object, String> doGetContentAnchorages() {
 		HashMultimap<Object, String> res = HashMultimap.create();
 		TextNodeRelation nr = getContent();
 		res.put( nr.getParent(), ROLE_START );
@@ -77,15 +92,16 @@ public class TextNodeRelationPart extends AbstractFXContentPart<Connection> {
 	}
 
 	@Override
-	public List<? extends Object> getContentChildren() {
+	public List<? extends Object> doGetContentChildren() {
 		return Collections.emptyList();
 	}
 
 	@SuppressWarnings("serial")
 	@Override
-	protected void attachToAnchorageVisual( IVisualPart<Node, ? extends Node> anchorage, String role) {
+	protected void doAttachToAnchorageVisual( IVisualPart<? extends Node> anchorage, String role) {
 		Provider<? extends IAnchor> provider = anchorage.getAdapter(new TypeToken<Provider<? extends IAnchor>>() {});
 		
+		if (provider == null) return;
 		IAnchor anchor = provider.get();
 		if (role.equals(ROLE_START)) {
 			getVisual().setStartAnchor(anchor);

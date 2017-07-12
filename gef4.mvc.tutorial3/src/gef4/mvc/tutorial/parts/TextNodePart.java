@@ -5,11 +5,11 @@ import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.gef4.fx.nodes.GeometryNode;
-import org.eclipse.gef4.geometry.planar.Dimension;
-import org.eclipse.gef4.geometry.planar.Rectangle;
-import org.eclipse.gef4.geometry.planar.RoundedRectangle;
-import org.eclipse.gef4.mvc.fx.parts.AbstractFXContentPart;
+import org.eclipse.gef.fx.nodes.GeometryNode;
+import org.eclipse.gef.geometry.planar.Dimension;
+import org.eclipse.gef.geometry.planar.Rectangle;
+import org.eclipse.gef.geometry.planar.RoundedRectangle;
+import org.eclipse.gef.mvc.fx.parts.AbstractContentPart;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
@@ -26,7 +26,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
-public class TextNodePart extends AbstractFXContentPart<Group> implements PropertyChangeListener {
+public class TextNodePart extends AbstractContentPart<Group> implements PropertyChangeListener {
 
 	private Text text;
 	private GeometryNode<RoundedRectangle> fxRoundedRectNode;
@@ -54,9 +54,9 @@ public class TextNodePart extends AbstractFXContentPart<Group> implements Proper
 	public TextNode getContent() {
 		return (TextNode) super.getContent();
 	}
-
+	
 	@Override
-	protected Group createVisual() {
+	protected Group doCreateVisual() {
 		Group group = new Group();
 		text = new Text();
 		fxRoundedRectNode = new GeometryNode<>();

@@ -15,11 +15,11 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.eclipse.gef4.common.properties.IPropertyChangeNotifier;
+//import org.eclipse.gef.common.properties.IPropertyChangeNotifier;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-public class TextNode implements IPropertyChangeNotifier {
+public class TextNode /*implements IPropertyChangeNotifier*/ {
 
 	public final String POSITION_PROPERTY = "position";
 	public final String TEXT_PROPERTY = "text";
@@ -53,6 +53,7 @@ public class TextNode implements IPropertyChangeNotifier {
 		return text;
 	}
 
+/*
 	@Override
 	public void addPropertyChangeListener(PropertyChangeListener listener) {
 		pcs.addPropertyChangeListener(listener);
@@ -61,7 +62,7 @@ public class TextNode implements IPropertyChangeNotifier {
 	public void removePropertyChangeListener(PropertyChangeListener listener) {
 		pcs.removePropertyChangeListener(listener);
 	}
-
+*/
 	public void setText(String text) {
 		String textOld = this.text;
 		this.text = text;

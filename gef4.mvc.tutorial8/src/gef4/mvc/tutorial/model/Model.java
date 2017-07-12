@@ -14,15 +14,15 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.eclipse.gef4.common.properties.IPropertyChangeNotifier;
+//import org.eclipse.gef.common.properties.IPropertyChangeNotifier;
 
 import javafx.util.Pair;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-public class Model implements IPropertyChangeNotifier {
+public class Model /*implements IPropertyChangeNotifier */ {
 
-	protected PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+	//protected PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
 	@XmlIDREF
 	@XmlAttribute(name="RootNode")
@@ -31,7 +31,7 @@ public class Model implements IPropertyChangeNotifier {
 	@XmlElementWrapper(name="AllNodes")
 	@XmlElement(name="Node")
 	public TreeSet<TextNode> allNodes = new TreeSet<>((o1, o2) -> o1.id.compareTo(o2.id));
-	
+/*	
 	@Override
 	public void addPropertyChangeListener(PropertyChangeListener listener) {
 		pcs.addPropertyChangeListener(listener);
@@ -41,7 +41,7 @@ public class Model implements IPropertyChangeNotifier {
 	public void removePropertyChangeListener(PropertyChangeListener listener) {
 		pcs.removePropertyChangeListener(listener);
 	}
-
+*/
 	private void setTextNodeParents(TextNode parent){
 		for( TextNode c : parent.childs ){
 			c.setParent(parent);

@@ -9,17 +9,16 @@
  *     Matthias Wienand (itemis AG) - initial API and implementation
  *
  *******************************************************************************/
-package gef4.mvc.tutorial.policies;
+package gef4.mvc.tutorial.handlers;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.gef4.fx.nodes.InfiniteCanvas;
-import org.eclipse.gef4.mvc.fx.policies.IFXOnClickPolicy;
-import org.eclipse.gef4.mvc.fx.viewer.FXViewer;
-import org.eclipse.gef4.mvc.parts.IContentPart;
-import org.eclipse.gef4.mvc.parts.IRootPart;
-import org.eclipse.gef4.mvc.policies.AbstractInteractionPolicy;
-import org.eclipse.gef4.mvc.policies.CreationPolicy;
-import org.eclipse.gef4.mvc.viewer.IViewer;
+import org.eclipse.gef.fx.nodes.InfiniteCanvas;
+import org.eclipse.gef.mvc.fx.handlers.IOnClickHandler;
+import org.eclipse.gef.mvc.fx.handlers.AbstractHandler;
+import org.eclipse.gef.mvc.fx.viewer.IViewer;
+import org.eclipse.gef.mvc.fx.parts.IContentPart;
+import org.eclipse.gef.mvc.fx.parts.IRootPart;
+import org.eclipse.gef.mvc.fx.policies.CreationPolicy;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.reflect.TypeToken;
@@ -39,7 +38,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Popup;
 
 // TODO: only applicable for FXRootPart and FXViewer
-public class CreationMenuOnClickPolicy extends AbstractInteractionPolicy<Node> implements IFXOnClickPolicy {
+public class CreationMenuOnClickHandler extends AbstractHandler implements IOnClickHandler {
 
 	/**
 	 * The adapter role for the
@@ -62,7 +61,7 @@ public class CreationMenuOnClickPolicy extends AbstractInteractionPolicy<Node> i
 
 			// use the viewer to transform into local coordinates
 			// this works even if the viewer is scrolled and/or zoomed.
-			InfiniteCanvas infiniteCanvas = getViewer().getCanvas();
+			InfiniteCanvas infiniteCanvas = (InfiniteCanvas)getViewer().getCanvas();
 			initialMousePositionInScene = infiniteCanvas.getContentGroup().screenToLocal(initialMousePositionInScreen);
 
 			// only open if the even was on the visible canvas
@@ -72,8 +71,8 @@ public class CreationMenuOnClickPolicy extends AbstractInteractionPolicy<Node> i
 		}
 	}
 
-	private FXViewer getViewer() {
-		return (FXViewer) getHost().getRoot().getViewer();
+	private IViewer getViewer() {
+		return (IViewer) getHost().getRoot().getViewer();
 	}
 
 	private void openMenu(final MouseEvent me) {
@@ -88,7 +87,7 @@ public class CreationMenuOnClickPolicy extends AbstractInteractionPolicy<Node> i
 		hb.setStyle("-fx-border-width: 1px; -fx-border-color: DIMGRAY; -fx-background-color: lightgray");
 		Button first = new Button();
 		first.setOnAction(e -> this.addTextNode());
-		ImageView iv = new ImageView(new Image(CreationMenuOnClickPolicy.class.getResourceAsStream("AddTextNode.png")));
+		ImageView iv = new ImageView(new Image(CreationMenuOnClickHandler.class.getResourceAsStream("AddTextNode.png")));
 		iv.autosize();
 		first.setGraphic(iv);
 		hb.getChildren().add(first);
@@ -96,26 +95,27 @@ public class CreationMenuOnClickPolicy extends AbstractInteractionPolicy<Node> i
 		hb.setSpacing(4);
 		hb.setPadding(new Insets(4, 4, 4, 4));
 		popup.getContent().addAll(hb);
-		popup.show(getViewer().getScene().getWindow());
+		popup.show(((Node) getViewer()).getScene().getWindow());
 
 	}
 
 	private void addTextNode() {
 
-		IRootPart<Node, ? extends Node> root = getHost().getRoot();
-		IViewer<Node> viewer = root.getViewer();
+		IRootPart<? extends Node> root = getHost().getRoot();
+		IViewer viewer = root.getViewer();
 
 		TextNode textNode = new TextNode(initialMousePositionInScene.getX(), initialMousePositionInScene.getY(), "A");
-		IContentPart<Node, ? extends Node> contentPartModel = getHost().getRoot().getContentPartChildren().get(0);
+		IContentPart<? extends Node> contentPartModel = getHost().getRoot().getContentPartChildren().get(0);
 
 		// build create operation
-		CreationPolicy<Node> creationPolicy = root.getAdapter(new TypeToken<CreationPolicy<Node>>(){});
+		CreationPolicy creationPolicy = root.getAdapter(new TypeToken<CreationPolicy>(){
+			private static final long serialVersionUID = 1L;});
 		creationPolicy.init();
 		creationPolicy.create(textNode, contentPartModel, HashMultimap.create());
 
 		// execute on stack
 		try {
-			viewer.getDomain().execute(creationPolicy.commit());
+			viewer.getDomain().execute(creationPolicy.commit(),null);
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

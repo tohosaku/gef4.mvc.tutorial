@@ -3,11 +3,11 @@ package gef4.mvc.tutorial.parts;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.gef4.fx.nodes.GeometryNode;
-import org.eclipse.gef4.geometry.planar.Dimension;
-import org.eclipse.gef4.geometry.planar.Rectangle;
-import org.eclipse.gef4.geometry.planar.RoundedRectangle;
-import org.eclipse.gef4.mvc.fx.parts.AbstractFXContentPart;
+import org.eclipse.gef.fx.nodes.GeometryNode;
+import org.eclipse.gef.geometry.planar.RoundedRectangle;
+import org.eclipse.gef.geometry.planar.Dimension;
+import org.eclipse.gef.geometry.planar.Rectangle;
+import org.eclipse.gef.mvc.fx.parts.AbstractContentPart;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
@@ -22,16 +22,11 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
-public class ModelPart extends AbstractFXContentPart<Group> {
+public class ModelPart extends AbstractContentPart<Group> {
 
 	@Override
 	public Model getContent() {
 		return (Model) super.getContent();
-	}
-
-	@Override
-	protected Group createVisual() {
-		return new Group();
 	}
 
 	@Override
@@ -77,5 +72,12 @@ public class ModelPart extends AbstractFXContentPart<Group> {
 	@Override
 	public List<? extends Object> doGetContentChildren() {
 		return Collections.emptyList();
+	}
+
+	@Override
+	protected Group doCreateVisual() {
+		Group visual = new Group();
+		doRefreshVisual(visual);
+		return visual;
 	}
 }

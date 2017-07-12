@@ -10,22 +10,21 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.eclipse.gef4.common.adapt.AdapterKey;
-import org.eclipse.gef4.common.adapt.inject.AdapterMaps;
-import org.eclipse.gef4.fx.nodes.InfiniteCanvas;
-import org.eclipse.gef4.mvc.fx.MvcFxModule;
-import org.eclipse.gef4.mvc.fx.domain.FXDomain;
-import org.eclipse.gef4.mvc.fx.parts.FXDefaultHoverFeedbackPartFactory;
-import org.eclipse.gef4.mvc.fx.parts.FXDefaultSelectionFeedbackPartFactory;
-import org.eclipse.gef4.mvc.fx.parts.FXDefaultSelectionHandlePartFactory;
-import org.eclipse.gef4.mvc.fx.policies.FXFocusAndSelectOnClickPolicy;
-import org.eclipse.gef4.mvc.fx.policies.FXHoverOnHoverPolicy;
-import org.eclipse.gef4.mvc.fx.policies.FXTranslateSelectedOnDragPolicy;
-import org.eclipse.gef4.mvc.fx.providers.GeometricBoundsProvider;
-import org.eclipse.gef4.mvc.fx.providers.ShapeOutlineProvider;
-import org.eclipse.gef4.mvc.fx.viewer.FXViewer;
-import org.eclipse.gef4.mvc.models.ContentModel;
-import org.eclipse.gef4.mvc.parts.IContentPartFactory;
+import org.eclipse.gef.common.adapt.AdapterKey;
+import org.eclipse.gef.common.adapt.inject.AdapterMaps;
+import org.eclipse.gef.fx.nodes.InfiniteCanvas;
+import org.eclipse.gef.mvc.fx.MvcFxModule;
+import org.eclipse.gef.mvc.fx.domain.IDomain;
+import org.eclipse.gef.mvc.fx.parts.DefaultHoverFeedbackPartFactory;
+import org.eclipse.gef.mvc.fx.parts.DefaultSelectionFeedbackPartFactory;
+import org.eclipse.gef.mvc.fx.parts.DefaultSelectionHandlePartFactory;
+import org.eclipse.gef.mvc.fx.handlers.FocusAndSelectOnClickHandler;
+import org.eclipse.gef.mvc.fx.handlers.HoverOnHoverHandler;
+import org.eclipse.gef.mvc.fx.handlers.TranslateSelectedOnDragHandler;
+import org.eclipse.gef.mvc.fx.providers.GeometricBoundsProvider;
+import org.eclipse.gef.mvc.fx.providers.ShapeOutlineProvider;
+import org.eclipse.gef.mvc.fx.viewer.IViewer;
+import org.eclipse.gef.mvc.fx.parts.IContentPartFactory;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -38,8 +37,8 @@ import gef4.mvc.tutorial.model.TextNode;
 import gef4.mvc.tutorial.parts.ModelPartFactory;
 import gef4.mvc.tutorial.parts.TextNodePart;
 import gef4.mvc.tutorial.policies.TextNodeTransformPolicy;
+
 import javafx.application.Application;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
@@ -60,9 +59,9 @@ public class Gef4MvcTutorial extends Application {
 
 		Injector injector = Guice.createInjector(createGuiceModule());
 
-		FXDomain domain = injector.getInstance(FXDomain.class);
+		IDomain domain = injector.getInstance(IDomain.class);
 
-		FXViewer viewer = domain.getAdapter(FXViewer.class);
+		IViewer viewer = domain.getAdapter(AdapterKey.get(IViewer.class,IDomain.CONTENT_VIEWER_ROLE));
 
 		AnchorPane paneCtrl = new AnchorPane();
 		AnchorPane paneDraw = new AnchorPane();
@@ -77,7 +76,7 @@ public class Gef4MvcTutorial extends Application {
 		AnchorPane.setLeftAnchor(btnUpdateModel, 10d);
 		AnchorPane.setRightAnchor(btnUpdateModel, 10d);
 
-		InfiniteCanvas drawingPane = viewer.getCanvas();
+		InfiniteCanvas drawingPane = (InfiniteCanvas)viewer.getCanvas();
 		paneDraw.getChildren().add(drawingPane);
 		paneDraw.setPrefHeight(2000);
 		AnchorPane.setTopAnchor(drawingPane, 10d);
@@ -96,7 +95,7 @@ public class Gef4MvcTutorial extends Application {
 
 		domain.activate();
 
-		viewer.getAdapter(ContentModel.class).getContents().setAll(createContents());
+		viewer.getContents().setAll(createContents());
 	}
 
 	@Override
@@ -140,9 +139,9 @@ public class Gef4MvcTutorial extends Application {
 				// viewer
 				// models and do not depend on transaction policies)
 
-				adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(FXFocusAndSelectOnClickPolicy.class);
+				adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(FocusAndSelectOnClickHandler.class);
 
-				adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(FXHoverOnHoverPolicy.class);
+				adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(HoverOnHoverHandler.class);
 
 				// geometry provider for selection feedback
 				adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(GeometricBoundsProvider.class);
@@ -154,23 +153,23 @@ public class Gef4MvcTutorial extends Application {
 			protected void bindTextNodePartAdapters(MapBinder<AdapterKey<?>, Object> adapterMapBinder) {
 				adapterMapBinder
 						.addBinding(AdapterKey
-								.role(FXDefaultSelectionFeedbackPartFactory.SELECTION_FEEDBACK_GEOMETRY_PROVIDER))
+								.role(DefaultSelectionFeedbackPartFactory.SELECTION_FEEDBACK_GEOMETRY_PROVIDER))
 						.to(ShapeOutlineProvider.class);
 
 				// geometry provider for selection handles
 				adapterMapBinder
 						.addBinding(AdapterKey
-								.role(FXDefaultSelectionHandlePartFactory.SELECTION_HANDLES_GEOMETRY_PROVIDER))
+								.role(DefaultSelectionHandlePartFactory.SELECTION_HANDLES_GEOMETRY_PROVIDER))
 						.to(ShapeOutlineProvider.class);
 
 				adapterMapBinder
 						.addBinding(AdapterKey
-								.role(FXDefaultSelectionFeedbackPartFactory.SELECTION_LINK_FEEDBACK_GEOMETRY_PROVIDER))
+								.role(DefaultSelectionFeedbackPartFactory.SELECTION_LINK_FEEDBACK_GEOMETRY_PROVIDER))
 						.to(ShapeOutlineProvider.class);
 
 				// geometry provider for hover feedback
 				adapterMapBinder
-						.addBinding(AdapterKey.role(FXDefaultHoverFeedbackPartFactory.HOVER_FEEDBACK_GEOMETRY_PROVIDER))
+						.addBinding(AdapterKey.role(DefaultHoverFeedbackPartFactory.HOVER_FEEDBACK_GEOMETRY_PROVIDER))
 						.to(ShapeOutlineProvider.class);
 
 				// register resize/transform policies (writing changes also to
@@ -180,14 +179,14 @@ public class Gef4MvcTutorial extends Application {
 
 				// interaction policies to relocate on drag (including anchored
 				// elements, which are linked)
-				adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(FXTranslateSelectedOnDragPolicy.class);
+				adapterMapBinder.addBinding(AdapterKey.defaultRole()).to(TranslateSelectedOnDragHandler.class);
 			}
 
 			@Override
 			protected void configure() {
 				super.configure();
 
-				binder().bind(new TypeLiteral<IContentPartFactory<Node>>() {
+				binder().bind(new TypeLiteral<IContentPartFactory>() {
 				}).toInstance(new ModelPartFactory());
 
 				bindTextNodePartAdapters(AdapterMaps.getAdapterMapBinder(binder(), TextNodePart.class));

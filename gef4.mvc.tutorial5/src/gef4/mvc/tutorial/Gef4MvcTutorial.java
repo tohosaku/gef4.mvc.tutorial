@@ -10,10 +10,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.eclipse.gef4.fx.nodes.InfiniteCanvas;
-import org.eclipse.gef4.mvc.fx.domain.FXDomain;
-import org.eclipse.gef4.mvc.fx.viewer.FXViewer;
-import org.eclipse.gef4.mvc.models.ContentModel;
+import org.eclipse.gef.fx.nodes.InfiniteCanvas;
+import org.eclipse.gef.mvc.fx.domain.IDomain;
+import org.eclipse.gef.mvc.fx.viewer.IViewer;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -42,9 +41,9 @@ public class Gef4MvcTutorial extends Application {
 
 		Injector injector = Guice.createInjector(createGuiceModule());
 
-		FXDomain domain = injector.getInstance(FXDomain.class);
+		IDomain domain = injector.getInstance(IDomain.class);
 
-		FXViewer viewer = domain.getAdapter(FXViewer.class);
+		IViewer viewer = domain.getAdapter(IViewer.class);
 
 		AnchorPane paneCtrl = new AnchorPane();
 		AnchorPane paneDraw = new AnchorPane();
@@ -59,7 +58,7 @@ public class Gef4MvcTutorial extends Application {
 		AnchorPane.setLeftAnchor(btnUpdateModel, 10d);
 		AnchorPane.setRightAnchor(btnUpdateModel, 10d);
 
-		InfiniteCanvas drawingPane = viewer.getCanvas();
+		InfiniteCanvas drawingPane = (InfiniteCanvas)viewer.getCanvas();
 		paneDraw.getChildren().add(drawingPane);
 		paneDraw.setPrefHeight(2000);
 		AnchorPane.setTopAnchor(drawingPane, 10d);
@@ -78,7 +77,7 @@ public class Gef4MvcTutorial extends Application {
 
 		domain.activate();
 
-		viewer.getAdapter(ContentModel.class).getContents().setAll(createContents());
+		viewer.getContents().setAll(createContents());
 	}
 
 	@Override

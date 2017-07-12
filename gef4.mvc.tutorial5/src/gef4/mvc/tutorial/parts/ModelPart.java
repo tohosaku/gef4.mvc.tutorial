@@ -2,8 +2,8 @@ package gef4.mvc.tutorial.parts;
 
 import java.util.List;
 
-import org.eclipse.gef4.mvc.fx.parts.AbstractFXContentPart;
-import org.eclipse.gef4.mvc.parts.IVisualPart;
+import org.eclipse.gef.mvc.fx.parts.AbstractContentPart;
+import org.eclipse.gef.mvc.fx.parts.IVisualPart;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
@@ -14,7 +14,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Node;
 
-public class ModelPart extends AbstractFXContentPart<Group> {
+public class ModelPart extends AbstractContentPart<Group> {
 
 	@Override
 	public Model getContent() {
@@ -22,7 +22,7 @@ public class ModelPart extends AbstractFXContentPart<Group> {
 	}
 
 	@Override
-	protected Group createVisual() {
+	protected Group doCreateVisual() {
 		return new Group();
 	}
 
@@ -37,7 +37,7 @@ public class ModelPart extends AbstractFXContentPart<Group> {
 	}
 
 	@Override
-	protected void addChildVisual(IVisualPart<Node, ? extends Node> child, int index) {
+	protected void doAddChildVisual(IVisualPart<? extends Node> child, int index) {
 		ObservableList<Node> children = getVisual().getChildren();
 		Node visual = child.getVisual();
 		children.add(visual);

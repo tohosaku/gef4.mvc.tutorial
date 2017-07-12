@@ -15,7 +15,7 @@ import java.net.URL;
 
 import javafx.scene.image.Image;
 
-import org.eclipse.gef4.fx.nodes.HoverOverlayImageView;
+import org.eclipse.gef.fx.nodes.HoverOverlayImageView;
 
 public class DeleteHoverHandlePart extends AbstractLogoHoverHandlePart<HoverOverlayImageView> {
 
@@ -23,7 +23,7 @@ public class DeleteHoverHandlePart extends AbstractLogoHoverHandlePart<HoverOver
 	public static final String IMG_DELETE_DISABLED = "delete_obj_disabled.gif";
 
 	@Override
-	protected HoverOverlayImageView createVisual() {
+	protected HoverOverlayImageView doCreateVisual() {
 		URL overlayImageResource = DeleteHoverHandlePart.class.getResource(IMG_DELETE);
 		if (overlayImageResource == null) {
 			throw new IllegalStateException("Cannot find resource <" + IMG_DELETE + ">.");
@@ -41,5 +41,4 @@ public class DeleteHoverHandlePart extends AbstractLogoHoverHandlePart<HoverOver
 		blendImageView.overlayImageProperty().set(overlayImage);
 		return blendImageView;
 	}
-
 }

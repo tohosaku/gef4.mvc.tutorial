@@ -3,11 +3,11 @@ package gef4.mvc.tutorial;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.gef4.mvc.fx.MvcFxModule;
-import org.eclipse.gef4.mvc.fx.domain.FXDomain;
-import org.eclipse.gef4.mvc.fx.viewer.FXViewer;
-import org.eclipse.gef4.mvc.models.ContentModel;
-import org.eclipse.gef4.mvc.parts.IContentPartFactory;
+import org.eclipse.gef.mvc.fx.MvcFxModule;
+import org.eclipse.gef.mvc.fx.domain.IDomain;
+import org.eclipse.gef.mvc.fx.viewer.IViewer;
+import org.eclipse.gef.mvc.fx.parts.IContentPartFactory;
+import org.eclipse.gef.common.adapt.AdapterKey;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -16,8 +16,8 @@ import com.google.inject.TypeLiteral;
 
 import gef4.mvc.tutorial.model.Model;
 import gef4.mvc.tutorial.parts.ModelPartFactory;
+
 import javafx.application.Application;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -31,10 +31,10 @@ public class Gef4MvcTutorial extends Application {
 
 		Injector injector = Guice.createInjector(createGuiceModule());
 
-		FXDomain domain = injector.getInstance(FXDomain.class);
+		IDomain domain = injector.getInstance(IDomain.class);
 
 		// hook the (single) viewer into the stage
-		FXViewer viewer = domain.getAdapter(FXViewer.class);
+		IViewer viewer = domain.getAdapter(AdapterKey.get(IViewer.class,IDomain.CONTENT_VIEWER_ROLE));
 		primaryStage.setScene(new Scene(viewer.getCanvas()));
 
 		primaryStage.setResizable(true);
@@ -48,7 +48,7 @@ public class Gef4MvcTutorial extends Application {
 		domain.activate();
 
 		// set viewer contents
-		viewer.getAdapter(ContentModel.class).getContents().setAll(createContents());
+		viewer.getContents().setAll(createContents());
 	}
 
 	protected List<? extends Object> createContents() {
@@ -61,7 +61,7 @@ public class Gef4MvcTutorial extends Application {
 			protected void configure() {
 				super.configure();
 
-				binder().bind(new TypeLiteral<IContentPartFactory<Node>>() {
+				binder().bind(new TypeLiteral<IContentPartFactory>() {
 				}).toInstance(new ModelPartFactory());
 
 			}

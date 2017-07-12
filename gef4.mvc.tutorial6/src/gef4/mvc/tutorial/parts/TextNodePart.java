@@ -6,14 +6,14 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.gef4.fx.nodes.GeometryNode;
-import org.eclipse.gef4.geometry.planar.Point;
-import org.eclipse.gef4.geometry.planar.Rectangle;
-import org.eclipse.gef4.geometry.planar.RoundedRectangle;
-import org.eclipse.gef4.mvc.fx.parts.AbstractFXContentPart;
-import org.eclipse.gef4.mvc.fx.policies.FXTransformPolicy;
-import org.eclipse.gef4.mvc.models.FocusModel;
-import org.eclipse.gef4.mvc.parts.IContentPart;
+import org.eclipse.gef.fx.nodes.GeometryNode;
+import org.eclipse.gef.geometry.planar.Point;
+import org.eclipse.gef.geometry.planar.Rectangle;
+import org.eclipse.gef.geometry.planar.RoundedRectangle;
+import org.eclipse.gef.mvc.fx.parts.AbstractContentPart;
+import org.eclipse.gef.mvc.fx.models.FocusModel;
+import org.eclipse.gef.mvc.fx.parts.IContentPart;
+import org.eclipse.gef.mvc.fx.parts.ITransformableContentPart;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
@@ -35,7 +35,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Affine;
 
-public class TextNodePart extends AbstractFXContentPart<StackPane> implements PropertyChangeListener {
+public class TextNodePart extends AbstractContentPart<StackPane> implements PropertyChangeListener,ITransformableContentPart<StackPane> {
 
 	private Text text;
 	private GeometryNode<RoundedRectangle> fxRoundedRectNode;
@@ -51,7 +51,7 @@ public class TextNodePart extends AbstractFXContentPart<StackPane> implements Pr
 		}
 	};
 
-	private class FocusListener implements ChangeListener<IContentPart<Node, ? extends Node>> {
+	private class FocusListener implements ChangeListener<IContentPart<? extends Node>> {
 
 		private final TextNodePart nodePart;
 
@@ -60,8 +60,8 @@ public class TextNodePart extends AbstractFXContentPart<StackPane> implements Pr
 		}
 
 		@Override
-		public void changed(ObservableValue<? extends IContentPart<Node, ? extends Node>> observable,
-				IContentPart<Node, ? extends Node> oldValue, IContentPart<Node, ? extends Node> newValue) {
+		public void changed(ObservableValue<? extends IContentPart<? extends Node>> observable,
+				IContentPart<? extends Node> oldValue, IContentPart<? extends Node> newValue) {
 
 			if (nodePart != newValue) {
 
@@ -71,7 +71,7 @@ public class TextNodePart extends AbstractFXContentPart<StackPane> implements Pr
 		}
 	}
 
-	private ChangeListener<IContentPart<Node, ? extends Node>> focusObserver = new FocusListener(this);
+	private ChangeListener<IContentPart<? extends Node>> focusObserver = new FocusListener(this);
 
 	@SuppressWarnings("serial")
 	@Override
@@ -79,7 +79,7 @@ public class TextNodePart extends AbstractFXContentPart<StackPane> implements Pr
 		super.doActivate();
 		getContent().addPropertyChangeListener(objectObserver);
 
-		FocusModel<Node> focusModel = getRoot().getViewer().getAdapter(new TypeToken<FocusModel<Node>>() {
+		FocusModel focusModel = getRoot().getViewer().getAdapter(new TypeToken<FocusModel>() {
 		});
 
 		focusModel.focusProperty().addListener(focusObserver);
@@ -91,7 +91,7 @@ public class TextNodePart extends AbstractFXContentPart<StackPane> implements Pr
 	protected void doDeactivate() {
 		getContent().removePropertyChangeListener(objectObserver);
 
-		FocusModel<Node> focusModel = getRoot().getViewer().getAdapter(new TypeToken<FocusModel<Node>>() {
+		FocusModel focusModel = getRoot().getViewer().getAdapter(new TypeToken<FocusModel>() {
 		});
 		focusModel.focusProperty().removeListener(focusObserver);
 
@@ -104,7 +104,7 @@ public class TextNodePart extends AbstractFXContentPart<StackPane> implements Pr
 	}
 
 	@Override
-	protected StackPane createVisual() {
+	protected StackPane doCreateVisual() {
 		StackPane group = new StackPane();
 		text = new Text();
 		fxRoundedRectNode = new GeometryNode<>();
@@ -154,7 +154,7 @@ public class TextNodePart extends AbstractFXContentPart<StackPane> implements Pr
 
 		{
 			Point position = model.getPosition();
-			Affine affine = getAdapter(FXTransformPolicy.TRANSFORM_PROVIDER_KEY).get();
+			Affine affine = getAdapter(ITransformableContentPart.TRANSFORM_PROVIDER_KEY).get();
 			affine.setTx(position.x);
 			affine.setTy(position.y);
 		}
@@ -205,7 +205,7 @@ public class TextNodePart extends AbstractFXContentPart<StackPane> implements Pr
 			ChangeTextNodeTextOperation op = new ChangeTextNodeTextOperation(this, getContent().getText(), newText);
 
 			try {
-				getViewer().getDomain().execute(op);
+				getViewer().getDomain().execute(op, null);
 			} catch (ExecutionException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -237,4 +237,15 @@ public class TextNodePart extends AbstractFXContentPart<StackPane> implements Pr
 		return Collections.emptyList();
 	}
 
+	@Override
+	public Affine getContentTransform() {
+		return getAdapter(ITransformableContentPart.TRANSFORM_PROVIDER_KEY).get();
+	}
+
+	@Override
+	public void setContentTransform(Affine totalTransform) {
+		Affine affine = getAdapter(ITransformableContentPart.TRANSFORM_PROVIDER_KEY).get();
+		affine.setTx(totalTransform.getTx());
+		affine.setTy(totalTransform.getTy());
+	}
 }

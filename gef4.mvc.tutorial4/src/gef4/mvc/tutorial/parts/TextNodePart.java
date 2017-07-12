@@ -3,13 +3,13 @@ package gef4.mvc.tutorial.parts;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.gef4.fx.nodes.GeometryNode;
-import org.eclipse.gef4.geometry.planar.Dimension;
-import org.eclipse.gef4.geometry.planar.Point;
-import org.eclipse.gef4.geometry.planar.Rectangle;
-import org.eclipse.gef4.geometry.planar.RoundedRectangle;
-import org.eclipse.gef4.mvc.fx.parts.AbstractFXContentPart;
-import org.eclipse.gef4.mvc.fx.policies.FXTransformPolicy;
+import org.eclipse.gef.fx.nodes.GeometryNode;
+import org.eclipse.gef.geometry.planar.Dimension;
+import org.eclipse.gef.geometry.planar.Point;
+import org.eclipse.gef.geometry.planar.Rectangle;
+import org.eclipse.gef.geometry.planar.RoundedRectangle;
+import org.eclipse.gef.mvc.fx.parts.AbstractContentPart;
+import org.eclipse.gef.mvc.fx.parts.ITransformableContentPart;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
@@ -27,7 +27,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Affine;
 
-public class TextNodePart extends AbstractFXContentPart<Group> {
+public class TextNodePart extends AbstractContentPart<Group> implements ITransformableContentPart<Group> {
 
 	private Text text;
 	private GeometryNode<RoundedRectangle> fxRoundedRectNode;
@@ -58,7 +58,7 @@ public class TextNodePart extends AbstractFXContentPart<Group> {
 	}
 
 	@Override
-	protected Group createVisual() {
+	protected Group doCreateVisual() {
 		Group group = new Group();
 		text = new Text();
 		fxRoundedRectNode = new GeometryNode<>();
@@ -106,7 +106,7 @@ public class TextNodePart extends AbstractFXContentPart<Group> {
 		}
 		{
 			Point position = model.getPosition();
-			Affine affine = getAdapter(FXTransformPolicy.TRANSFORM_PROVIDER_KEY).get();
+			Affine affine = getAdapter(ITransformableContentPart.TRANSFORM_PROVIDER_KEY).get();
 			affine.setTx(position.x);
 			affine.setTy(position.y);
 		}
@@ -136,4 +136,15 @@ public class TextNodePart extends AbstractFXContentPart<Group> {
 		return Collections.emptyList();
 	}
 
+	@Override
+	public Affine getContentTransform() {
+		return getAdapter(ITransformableContentPart.TRANSFORM_PROVIDER_KEY).get();
+	}
+
+	@Override
+	public void setContentTransform(Affine totalTransform) {
+		Affine affine = getAdapter(ITransformableContentPart.TRANSFORM_PROVIDER_KEY).get();
+		affine.setTx(totalTransform.getTx());
+		affine.setTy(totalTransform.getTy());
+	}
 }

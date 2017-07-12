@@ -1,15 +1,16 @@
-package gef4.mvc.tutorial.policies;
+package gef4.mvc.tutorial.handlers;
 
-import org.eclipse.gef4.mvc.fx.policies.IFXOnTypePolicy;
-import org.eclipse.gef4.mvc.policies.AbstractInteractionPolicy;
+import java.util.Set;
+
+import org.eclipse.gef.mvc.fx.handlers.AbstractHandler;
+import org.eclipse.gef.mvc.fx.handlers.IOnTypeHandler;
 
 import gef4.mvc.tutorial.parts.TextNodePart;
-import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 //only applicable for NodeContentPart (see #getHost())
-public class TextNodeOnTypePolicy extends AbstractInteractionPolicy<Node> implements IFXOnTypePolicy {
+public class TextNodeOnTypeHandler extends AbstractHandler implements IOnTypeHandler {
 
 	@Override
 	public TextNodePart getHost() {
@@ -17,11 +18,11 @@ public class TextNodeOnTypePolicy extends AbstractInteractionPolicy<Node> implem
 	}
 
 	@Override
-	public void pressed(KeyEvent event) {
-		if (KeyCode.F2.equals(event.getCode()) && !getHost().isEditing()) {
+	public void type(KeyEvent event, Set<KeyCode> pressedKeys) {
+		if (pressedKeys.contains(KeyCode.F2) && !getHost().isEditing()) {
 			System.out.println("ExitEditingNodeLabelOnEnterPolicy.pressed() 1");
 			getHost().editModeStart();
-		} else if (KeyCode.ENTER.equals(event.getCode())) {
+		} else if (pressedKeys.contains(KeyCode.ENTER)) {
 			if (getHost().isEditing()) {
 				System.out.println("ExitEditingNodeLabelOnEnterPolicy.pressed() 2");
 				event.consume();
@@ -31,24 +32,9 @@ public class TextNodeOnTypePolicy extends AbstractInteractionPolicy<Node> implem
 				event.consume();
 				getHost().editModeStart();
 			}
-		} else if (KeyCode.ESCAPE.equals(event.getCode())) {
+		} else if (pressedKeys.contains(KeyCode.ESCAPE)) {
 			event.consume();
 			getHost().editModeEnd(false);
 		}
 	}
-
-	@Override
-	public void released(KeyEvent event) {
-	}
-
-	@Override
-	public void typed(KeyEvent event) {
-
-	}
-
-	@Override
-	public void unfocus() {
-
-	}
-
 }
